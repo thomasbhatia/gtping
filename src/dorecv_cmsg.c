@@ -13,6 +13,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#define __APPLE_USE_RFC_2292
 
 /* For Solaris we need some defines */
 #if defined (__SVR4) && defined (__sun)
