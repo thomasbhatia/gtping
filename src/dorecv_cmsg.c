@@ -13,8 +13,13 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#define __APPLE_USE_RFC_2292
 
+/* For OSX 10.7 RFC 3542 based IPv6 socket options
+ * are incompatible with RFC 2292
+ */
+#if defined (__APPLE__) && defined (__MACH__)
+# define __APPLE_USE_RFC_2292
+#endif
 /* For Solaris we need some defines */
 #if defined (__SVR4) && defined (__sun)
 /* SUS (XPG4v2) */
@@ -47,7 +52,7 @@
 #endif
 
 /**
- * 
+ *
  */
 ssize_t
 doRecv(int sock, void *data, size_t len, int *ttl, int *tos)
@@ -70,7 +75,7 @@ doRecv(int sock, void *data, size_t len, int *ttl, int *tos)
         iov.iov_len = len;
 
         memset(&msgh, 0, sizeof(msgh));
-        
+
         msgh.msg_iov = &iov;
         msgh.msg_iovlen = 1;
         msgh.msg_control = msgcontrol;
