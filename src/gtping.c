@@ -91,33 +91,33 @@ static unsigned int connectionRefused = 0;
 /* from cmdline */
 const char *argv0 = 0;
 struct Options options = {
-        port: DEFAULT_PORT,         /* -p <port> */
-        verbose: DEFAULT_VERBOSE,   /* -v increments */
-        
-        flood: 0,      /* -f */
+        .port= DEFAULT_PORT,         /* -p <port> */
+        .verbose= DEFAULT_VERBOSE,   /* -v increments */
+
+        .flood= 0,      /* -f */
 
         /* if still <0, set to DEFAULT_INTERVAL.
          * set this way to make -f work with -i  */
-        interval: -1,  /* -i <time> */
-        
-        wait: -1,      /* -w <time> */
-        autowait: 0,   /* 0 = -w not used, continuously update options.wait  */
+        .interval= -1,  /* -i <time> */
 
-        count: 0,      /* -c, 0 is infinite */
-        target: 0,     /* arg */
-        targetip: 0,   /* resolved arg */
-        ttl: -1,       /* -T <ttl> */
-        tos: -1,       /* -Q <dscp> */
-        has_teid: 0,   /* -t <teid> */
-        teid: 0,       /* -t <teid> */
-        af: AF_UNSPEC, /* -4 or -6 */
-        version: DEFAULT_GTPVERSION, /* -g <version> */
+        .wait= -1,      /* -w <time> */
+        .autowait= 0,   /* 0 = -w not used, continuously update options.wait  */
 
-        source:      NULL,  /* -s <source if or addr> */
-        source_port: "0",   /* -P <num> */
+        .count= 0,      /* -c, 0 is infinite */
+        .target= 0,     /* arg */
+        .targetip= 0,   /* resolved arg */
+        .ttl= -1,       /* -T <ttl> */
+        .tos= -1,       /* -Q <dscp> */
+        .has_teid= 0,   /* -t <teid> */
+        .teid= 0,       /* -t <teid> */
+        .af= AF_UNSPEC, /* -4 or -6 */
+        .version= DEFAULT_GTPVERSION, /* -g <version> */
 
-        traceroute: 0, /* -r */
-        traceroutehops: DEFAULT_TRACEROUTEHOPS,  /* -r[<# per hop>] */
+        .source=      NULL,  /* -s <source if or addr> */
+        .source_port= "0",   /* -P <num> */
+
+        .traceroute= 0, /* -r */
+        .traceroutehops= DEFAULT_TRACEROUTEHOPS,  /* -r[<# per hop>] */
 };
 
 static const char *dscpTable[][2] = {
@@ -563,7 +563,7 @@ mkping_v1(int seq, void **packet)
         gtp->proto_type = 1; /* GTP, as opposed to GTP' */
         gtp->msg = GTPMSG_ECHO;
         gtp->len = htons(4);
-        if (options.teid >= 0) {
+        if (options.teid > 0) {
                 gtp->teid = htonl(options.teid);
         } else {
                 gtp->teid = 0;
@@ -881,7 +881,7 @@ recvEchoReply(int fd)
 	}
 
 	now = clock_get_dbl();
-	
+
 	memset(packet, 0, sizeof(packet));
         if (0 > (packetlen = doRecv(fd,
                                     (void*)packet,
@@ -1025,7 +1025,7 @@ tracerouteMainloop(int fd)
 		fds.fd = fd;
 		fds.events = POLLIN;
 		fds.revents = 0;
-                
+
                 /* time to send yet? */
 		curPingTime = clock_get_dbl();
 		if ((lastRecvTime >= lastPingTime)
@@ -1188,7 +1188,7 @@ pingMainloop(int fd)
 		fds.fd = fd;
 		fds.events = POLLIN;
 		fds.revents = 0;
-		
+
                 /* max waittime: until it's time to send the next one */
                 timewait = lastpingTime+options.interval - clock_get_dbl();
 
@@ -1247,7 +1247,7 @@ pingMainloop(int fd)
 			exit(2);
 			break;
 		}
-			
+
 	}
 	printf("\n--- %s GTP ping statistics ---\n"
                "%u packets transmitted, %u received, "
@@ -1404,7 +1404,7 @@ string2Tos(const char *instr)
          * This code depends on instr not being empty (checked above) */
         for (cp = instr; ; cp++) {
                 if (*cp != '0') {
-                        break;  
+                        break;
                 }
                 if (*cp == 0) {
                         return 0;
@@ -1425,7 +1425,7 @@ string2Tos(const char *instr)
                         rets = cur[1];
                 }
         }
-        
+
         if (rets) {
                 /* if match was found, translate to number */
                 ret = (int)strtol(rets, 0, 0);
